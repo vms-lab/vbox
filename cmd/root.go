@@ -17,13 +17,25 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
+	"log"
 	"os"
+
+	"github.com/spf13/cobra"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
 )
 
+type vmConfig struct {
+	Cpu string
+	Mem string
+}
+
+type config struct {
+	Vms map[string]vmConfig
+}
+
+var cfg config
 var cfgFile string
 
 // rootCmd represents the base command when called without any subcommands
@@ -87,5 +99,10 @@ func initConfig() {
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
+	}
+
+	err := viper.Unmarshal(&cfg)
+	if err != nil {
+		log.Fatalf("unable to decode into struct, %v", err)
 	}
 }
