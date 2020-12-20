@@ -17,9 +17,9 @@ package cmd
 
 import (
 	"log"
-	"os/exec"
 
 	"github.com/spf13/cobra"
+	"github.com/vms-lab/vbox/vbox"
 )
 
 // applyCmd represents the apply command
@@ -34,21 +34,16 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Println("apply called")
-		// log.Printf("%v", cfg) //viper.Get("vms"))
-		// log.Printf("%v", viper.Get("vms"))
-		for vmName, vm := range cfg.Vms {
-			// TODO: use unmarshaling
-			//       https://github.com/spf13/viper#unmarshaling
-			log.Println(vmName)
-			log.Printf("\t%s\n", vm.Cpu)
-			log.Printf("\t%s\n", vm.Mem)
-		}
-		return
-		out, err := exec.Command("VBoxManage", "list", "vms").Output()
-		if err != nil {
-			log.Fatalf("Error during getting list vms: %v", err)
-		}
-		log.Printf("%s\n", out)
+		// for vmName, vm := range cfg.Vms {
+		// 	// TODO: use unmarshaling
+		// 	//       https://github.com/spf13/viper#unmarshaling
+		// 	log.Println(vmName)
+		// 	log.Printf("\t%s\n", vm.Cpu)
+		// 	log.Printf("\t%s\n", vm.Mem)
+		// }
+		// return
+		mng := vbox.NewVBoxManager()
+		log.Printf("%v\n", mng.ListVMs())
 	},
 }
 

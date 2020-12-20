@@ -12,21 +12,28 @@ type VM struct {
 	UUID string
 }
 
-func reSubMatchMap(r *regexp.Regexp, str string) map[string]string {
-	match := r.FindStringSubmatch(str)
-	subMatchMap := map[string]string{}
-	for i, name := range r.SubexpNames() {
-		if i != 0 {
-			subMatchMap[name] = match[i]
-		}
-	}
+type VMSpec struct {
+	Name     string `x:"name"`
+	OSType   string `x:"ostype"`
+	UUID     string `x:"UUID"`
+	CPUs     string `x:"cpus"`
+	Memory   string `x:"memory"`
+	Groups   string `x:"groups"`
+	State    string `x:"VMState"`
+	Networks []VMNETSpec
+}
 
-	return subMatchMap
+type VMNETSpec struct {
+	NIC            string `x:"nic" numbered:"true"` //type ? nat, intnet, ...
+	MAC            string `x:"macaddress" numbered:"true"`
+	Name           string `x:"natnet,intnet" numbered:"true"` // identify other types and append list
+	CableConnected string `x:"cableconnected" numbered:"true"`
 }
 
 var vmsExp = regexp.MustCompile(`"(?P<name>.+)" {(?P<uuid>.+)}`)
 
-func ParseVMsList(vmList string) (vms []VM) {
+func (vbmng VBoxManager) ListVMs() (vms []VM) {
+	vmList := vbmng.Command("list", "vms")
 	scanner := bufio.NewScanner(strings.NewReader(vmList))
 	for scanner.Scan() {
 		vmMatch := reSubMatchMap(vmsExp, scanner.Text())
@@ -40,9 +47,4 @@ func ParseVMsList(vmList string) (vms []VM) {
 		log.Fatal(err)
 	}
 	return vms
-}
-
-func VMs() {
-	listVMs := Manage("list", "vms")
-	log.Println(listVMs)
 }
